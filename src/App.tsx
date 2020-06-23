@@ -1,26 +1,53 @@
 import React from 'react';
-import logo from './logo.svg';
+import useFileHandlers from './hooks/useFileHandlers';
 import './App.css';
+import { OnChangeInput } from './hooks/types';
+
+const Input = (props: { onChange: OnChangeInput }) => (
+	<input
+		type='file'
+		accept='image/*'
+		name='img-loader-input'
+		multiple
+		{...props}
+	/>
+);
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+	const { files, onChange, onSubmit, status, uploaded } = useFileHandlers();
+
+	return (
+		<div className='container'>
+			<form className='form' onSubmit={onSubmit}>
+				{status === 'files-uploaded' && (
+					<div className='success-container'>
+						<div>
+							<h2>Congratulations!</h2>
+							<small>You uploaded your files. Get some rest.</small>
+						</div>
+					</div>
+				)}
+				<div>
+					<Input onChange={onChange} />
+					<button type='submit'>Submit</button>
+				</div>
+				<div>
+					{files.map(({ file, src, id }, index) => (
+						<div
+							style={{
+								opacity: uploaded[id] ? 0.2 : 1,
+							}}
+							key={`thumb${index}`}
+							className='thumbnail-wrapper'
+						>
+							<img className='thumbnail' src={src} alt='' />
+							<div className='thumbnail-caption'>{file.name}</div>
+						</div>
+					))}
+				</div>
+			</form>
+		</div>
+	);
 }
 
 export default App;
